@@ -7,6 +7,7 @@ class DynamoDBClient {
   constructor(tableName) {
     const nodeEnv = process.env.NODE_ENV;
     const endpoint = process.env.DYNAMODB_ENDPOINT;
+
     let config = { region: 'ap-northeast-1' };
     if (nodeEnv === 'development') {
       const credentials = new AWS.SharedIniFileCredentials({profile: 'local'});

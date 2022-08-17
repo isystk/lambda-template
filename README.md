@@ -43,7 +43,7 @@ $ pip install aws-sam-cli
 $ sam --version
 
 # Docker内のDynamoDBにアクセスする為の設定ファイルを作成する
-$ aws configure --profile test
+$ aws configure --profile local
 AWS Access Key ID [None]: test
 AWS Secret Access Key [None]: test
 Default region name [None]: ap-northeast-1
@@ -73,18 +73,15 @@ Options:
 $ ./dc.sh start
 
 # DynamoDBにテーブルを作成する
-$ aws dynamodb create-table --cli-input-json file://app/schema/posts.json --endpoint-url http://localhost:8000  --billing-mode PAY_PER_REQUEST
-$ aws dynamodb list-tables  --endpoint-url http://localhost:8000 
-$ aws dynamodb scan --table-name posts  --endpoint-url http://localhost:8000
+$ ./dc.sh aws local
+$ aws dynamodb create-table --cli-input-json file://app/schema/posts.json --endpoint-url http://dynamodb:8000  --billing-mode PAY_PER_REQUEST
+$ aws dynamodb list-tables  --endpoint-url http://dynamodb:8000 
+$ aws dynamodb scan --table-name posts  --endpoint-url http://dynamodb:8000
 (テーブルを削除する場合)
-$ aws dynamodb delete-table --table-name posts --endpoint-url http://localhost:8000
-
-# APIを起動する（Expressを利用する場合）
-$ ./dc.sh api-start
+$ aws dynamodb delete-table --table-name posts --endpoint-url http://dynamodb:8000
 
 # APIを起動する (SAMを利用する場合)
 $ sam build
-$ sam local invoke
 $ sam local start-api --env-vars task/env.json
 
 # 登録
@@ -99,32 +96,31 @@ $ curl -X PUT -H "Content-Type: application/json" -d @app/data/post.json http://
 $ curl -X DELETE http://127.0.0.1:3000/posts/49e3de26-f28b-4140-becf-06d8b3279914/
 ```
 
-### 本番環境（AWS） にデプロイ
+本番環境（AWS） にデプロイ
 ```
-# Layer（共通モジュール）をデプロイ
-$ cd layer
-$ zip -r ../layer.zip .
-$ cd ..
-
-# Layer.zip をS3にアップロード
-$ aws s3 rm s3://aws-isystk-com-sam/lambda-template-layer/layer.zip
-$ aws s3 cp ./layer.zip s3://aws-isystk-com-sam/lambda-template-layer/
-
-# S3の Layer.zip をデプロイ
-$ aws cloudformation delete-stack --stack-name lambda-template-layer
-$ aws cloudformation deploy --stack-name lambda-template-layer --template-file layer-sam.yaml
-
-# 作成されたLayerのArnは後で使うので確認しておく
-$ aws cloudformation describe-stacks --stack-name lambda-template-layer --query "Stacks[].Outputs"
-
-# Lambda をデプロイする
+# ビルドを実行する（.aws-samディレクトリに生成される）
 $ sam build
-$ sam deploy
+# AWSに反映する
+$ sam deploy --config-env stg
+```
 
-# 動作確認
-$ curl "https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts"
-{"statusCode":200,"body":[{"id":"bbe53be9-79ee-4ba0-96d3-dc2d2a443b49","data":{"regist_datetime":"2022-06-03T08:03:50+00:00","description":"いいい","photo":"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAA
-・・・
+動作確認
+```
+# 登録
+$ curl -X POST -H "Content-Type: application/json" -d @app/data/post.json https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
+# 一覧取得
+$ curl https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
+# 単一取得
+$ curl https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
+# 更新
+$ curl -X PUT -H "Content-Type: application/json" -d @app/data/post.json https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
+# 削除
+$ curl -X DELETE https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
+```
+
+AWSから、DynamoDB、Lambda&APIGatewayを削除する
+```
+$ sam delete --stack-name simple-app --profile simple-app 
 ```
 
 ## 🎨 参考

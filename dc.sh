@@ -45,12 +45,6 @@ case ${1} in
         popd
     ;;
 
-    api-start)
-      pushd app
-      yarn start
-      popd
-    ;;
-
     aws)
       case ${2} in
           local)

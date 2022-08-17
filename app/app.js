@@ -57,6 +57,7 @@ const request = async (callback) => {
     try {
         body = await callback();
     } catch (err) {
+        console.log(err)
         statusCode = 400;
         body = err.message;
     }
