@@ -46,7 +46,7 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          DYNAMODB_ENDPOINT: ""
+          NODE_ENV: ""
       Layers:
         - !Ref AppLayer
       Events:

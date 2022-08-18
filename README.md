@@ -41,13 +41,6 @@ https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 # AWS SAM CLIをインストール
 $ pip install aws-sam-cli
 $ sam --version
-
-# Docker内のDynamoDBにアクセスする為の設定ファイルを作成する
-$ aws configure --profile local
-AWS Access Key ID [None]: test
-AWS Secret Access Key [None]: test
-Default region name [None]: ap-northeast-1
-Default output format [None]: json
 ```
 
 ## 🖊️ Docker 操作用シェルスクリプトの使い方
@@ -85,7 +78,7 @@ $ sam build
 $ sam local start-api --env-vars task/env.json
 
 # 登録
-$ curl -X POST -H "Content-Type: application/json" -d @app/data/post.json http://localhost:3000/posts
+$ curl -X POST -H "Content-Type: application/json" -d @app/data/post.json http://127.0.0.1:3000/posts
 # 一覧取得
 $ curl http://127.0.0.1:3000/posts
 # 単一取得

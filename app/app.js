@@ -1,11 +1,11 @@
 const DynamoDB = require('./dynamodb-client');
-const dbClient = new DynamoDB.DynamoDBClient('simple_app_posts');
+const dbClient = new DynamoDB.DynamoDBClient('posts');
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cors());
 
 app.get('/posts', async (req, res) => {
@@ -24,7 +24,7 @@ app.get('/posts/:id', async (req, res) => {
 })
 app.post('/posts', async (req, res) => {
     const json = await request(async () => {
-        const params = JSON.parse(req.body);
+        const params = req.body;
         return await dbClient.post(params);
     });
     res.json(json);

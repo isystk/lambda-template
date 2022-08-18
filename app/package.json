@@ -14,7 +14,6 @@
     "@vendia/serverless-express": "^4.5.2",
     "aws-sdk": "^2.1036.0",
     "axios": "^0.21.1",
-    "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "cors": "^2.8.5",
     "dynamodb-doc": "^1.0.0",

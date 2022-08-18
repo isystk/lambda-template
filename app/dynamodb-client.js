@@ -6,15 +6,13 @@ const _ = require('lodash')
 class DynamoDBClient {
   constructor(tableName) {
     const nodeEnv = process.env.NODE_ENV;
-    const endpoint = process.env.DYNAMODB_ENDPOINT;
-
     let config = { region: 'ap-northeast-1' };
+    console.log("nodeEnv", nodeEnv)
     if (nodeEnv === 'development') {
-      const credentials = new AWS.SharedIniFileCredentials({profile: 'local'});
       config = {
-        credentials,
-        region: 'ap-northeast-1',
-        endpoint
+        ...config,
+        endpoint: 'http://localhost:8000',
+        credentials: { accessKeyId: 'FAKE', secretAccessKey: 'FAKE' },
       };
     }
 
@@ -26,7 +24,9 @@ class DynamoDBClient {
     const dbParams = {
       TableName: this.tableName,
     }
+    console.log("scan")
     const result =  await this.documentClient.scan(dbParams, (err, data) => {
+      console.log("result", err, data)
       if (!data) return {};
       const items = data.Items
           .filter(e => {
