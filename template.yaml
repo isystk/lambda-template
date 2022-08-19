@@ -44,9 +44,6 @@ Resources:
       Handler: lambda.handler
       Runtime: nodejs16.x
       Policies: AmazonDynamoDBFullAccess
-      Environment:
-        Variables:
-          NODE_ENV: ""
       Layers:
         - !Ref AppLayer
       Events:
