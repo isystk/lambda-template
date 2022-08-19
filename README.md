@@ -15,7 +15,7 @@ SAM を利用して管理しているので、コマンドひとつでインフ�
 
 ## 🌐 Demo
 
-https://rj09q7y59d.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
+https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 
 ## 📦 ディレクトリ構造
 
