@@ -1,7 +1,7 @@
-const AWS = require('aws-sdk')
-const uuid = require('node-uuid')
-const moment = require('moment')
-const _ = require('lodash')
+import AWS from 'aws-sdk'
+import uuid from 'node-uuid'
+import moment from 'moment'
+import * as _ from 'lodash'
 
 class DynamoDBClient {
   constructor(tableName) {
@@ -111,4 +111,4 @@ class DynamoDBClient {
   }
 }
 
-exports.DynamoDBClient = DynamoDBClient;
+export {DynamoDBClient};
