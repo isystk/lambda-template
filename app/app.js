@@ -1,7 +1,7 @@
-const DynamoDB = require('./dynamodb-client');
-const dbClient = new DynamoDB.DynamoDBClient('simple_app_posts');
-const express = require('express');
-const cors = require('cors');
+import {DynamoDBClient} from './dynamodb-client.js'
+const dbClient = new DynamoDBClient('simple_app_posts');
+import express from 'express';
+import cors from 'cors';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -68,4 +68,4 @@ const request = async (callback) => {
     };
 };
 
-module.exports = app
+export {app}

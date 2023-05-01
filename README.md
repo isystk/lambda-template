@@ -101,9 +101,11 @@ $ ./dc.sh aws local
 (テーブルを削除する場合)
 > aws dynamodb delete-table --table-name simple_app_posts --endpoint-url http://dynamodb:8000
 
+# ESModuleでビルドできるようにする
+$ npm install -g esbuild 
 # SAMでアプリをビルドしてからAPIを起動する
 $ sam build
-$ sam local start-api --docker-network lambda-local
+$ sam local start-api --env-vars task/env.json --docker-network lambda-local
 
 # 一覧取得
 $ curl http://127.0.0.1:3000/posts
