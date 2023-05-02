@@ -23,16 +23,16 @@ https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 .
 ├── README.md
 ├── app (Lambdaのモジュール)
-│   ├── app.js
 │   ├── data
-│   ├── dynamodb-client.js
-│   ├── lambda.js
-│   ├── local-app.js
+│   ├── dist
+│   ├── jest.config.ts
 │   ├── node_modules
 │   ├── package-lock.json
 │   ├── package.json
 │   ├── schema
-│   └── tests
+│   ├── src
+│   ├── tests
+│   └── tsconfig.json
 ├── dc.sh (Docker管理用のシェルスクリプト)
 ├── docker
 │   ├── awscli
@@ -41,6 +41,9 @@ https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 ├── layers (共通モジュール)
 │   └── app-layer
 ├── samconfig.toml
+├── task
+│   ├── env.json
+│   └── env.json.example
 └── template.yaml
 ```
 
