@@ -2,7 +2,6 @@
   "name": "lambda-template",
   "version": "1.0.0",
   "description": "lambda-template",
-  "main": "app.js",
   "author": "isystk",
   "license": "MIT",
   "scripts": {
