@@ -1,5 +1,5 @@
 {
-  "TableName": "simple_app_posts",
+  "TableName": "lambda_template_posts",
   "KeySchema": [
     {
       "AttributeName": "pk",

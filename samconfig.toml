@@ -11,7 +11,7 @@ region = "ap-northeast-1"
 profile = "lambda-user"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides="AppName=simple_app"
+parameter_overrides="AppName=lambda_template"
 # 本番環境用
 [prd.deploy.parameters]
 stack_name = "xxxxxx"
@@ -21,4 +21,4 @@ region = "ap-northeast-1"
 profile = "lambda-user"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides="AppName=simple_app"
+parameter_overrides="AppName=lambda_template"

@@ -1,5 +1,5 @@
 import { DynamoDBClient, DynamoDBRecord } from './dynamodb-client.js'
-const dbClient = new DynamoDBClient('simple_app_posts')
+const dbClient = new DynamoDBClient('lambda_template_posts')
 import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import uuid from 'node-uuid'

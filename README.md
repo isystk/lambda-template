@@ -103,7 +103,7 @@ $ ./dc.sh aws local
 > aws dynamodb list-tables  --endpoint-url http://dynamodb:8000 
 
 (テーブルを削除する場合)
-> aws dynamodb delete-table --table-name simple_app_posts --endpoint-url http://dynamodb:8000
+> aws dynamodb delete-table --table-name lambda_template_posts --endpoint-url http://dynamodb:8000
 
 # ESModuleでビルドできるようにする
 $ npm install -g esbuild 

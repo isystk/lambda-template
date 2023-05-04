@@ -10,7 +10,7 @@ Parameters:
   # パラメータ：アプリ名
   AppName:
     Type: String
-    Default: 'simple_app'
+    Default: 'lambda_template'
     Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
     MinLength: 3
     MaxLength: 50
