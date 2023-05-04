@@ -1,110 +1,135 @@
-import AWS from 'aws-sdk'
-import uuid from 'node-uuid'
-import moment from 'moment'
+import DynamoDB from 'aws-sdk/clients/dynamodb'
+
+export type DynamoDBRecord = {
+  created_at: string
+  updated_at: string
+} & KeyCondition
+export type KeyCondition = {
+  pk: string
+  sk: string
+}
+
 class DynamoDBClient {
-  private documentClient: AWS.DynamoDB.DocumentClient
+  private documentClient: DynamoDB.DocumentClient
   constructor(private readonly tableName: string) {
-    const nodeEnv = process.env.NODE_ENV
-    const awsSamLocal = process.env.AWS_SAM_LOCAL
+    const isLocal = process.env.IS_LOCAL
     let config: Record<never, never> = { region: 'ap-northeast-1' }
-    if (awsSamLocal) {
+    if (isLocal) {
       config = {
-        endpoint: 'http://dynamodb:8000',
-        credentials: { accessKeyId: 'FAKE', secretAccessKey: 'FAKE' },
-      }
-    } else if (nodeEnv === 'development') {
-      config = {
+        ...config,
         endpoint: 'http://localhost:8000',
         credentials: { accessKeyId: 'FAKE', secretAccessKey: 'FAKE' },
       }
     }
 
-    this.documentClient = new AWS.DynamoDB.DocumentClient(config)
+    this.documentClient = new DynamoDB.DocumentClient(config)
     this.tableName = tableName
   }
 
-  async list(userId: string | undefined, limit = 10, last: string | undefined) {
-    const dbParams = {
+  async scan<T>(
+    filter: string | undefined,
+    attributeNames: Record<never, never> | undefined,
+    attributeValues: Record<never, never> | undefined
+  ) {
+    const params: DynamoDB.DocumentClient.ScanInput = {
       TableName: this.tableName,
     }
-    console.log('scan')
-    const result = await this.documentClient
-      .scan(dbParams, (err, data) => {
-        console.log('result', err, data)
-        if (!data || !data.Items) return {}
-        const items = data.Items.filter((e) => {
-          return !userId || e.data.userId === userId
-        }).sort(function (a, b) {
-          return b.data.regist_datetime - a.data.regist_datetime
-        })
-        let index = last ? items.findIndex((item) => item.id === last) : 0
-        index = index < 0 ? 0 : index
-        data.Items = items.slice(index, index + limit)
-        if (err) {
-          return err
-        } else {
-          return data
-        }
-      })
-      .promise()
-    return result.Items
+    if (filter) {
+      params['FilterExpression'] = filter
+    }
+    if (attributeNames) {
+      params['ExpressionAttributeNames'] = attributeNames
+    }
+    if (attributeValues) {
+      params['ExpressionAttributeValues'] = attributeValues
+    }
+
+    // console.log('query Condition', params)
+    const { Items } = await this.documentClient.scan(params).promise()
+    // console.log('query Result', result)
+    return (
+      Items?.map((e) => {
+        return { ...e } as T
+      }) ?? []
+    )
   }
 
-  async find(id: string) {
+  async query<T>(
+    key: string,
+    filter: string | undefined,
+    attributeNames: Record<never, never> | undefined,
+    attributeValues: Record<never, never>
+  ) {
+    const params: DynamoDB.DocumentClient.QueryInput = {
+      TableName: this.tableName,
+    }
+    params['KeyConditionExpression'] = key
+    if (filter) {
+      params['FilterExpression'] = filter
+    }
+    if (attributeNames) {
+      params['ExpressionAttributeNames'] = attributeNames
+    }
+    params['ExpressionAttributeValues'] = attributeValues
+
+    // console.log('query Condition', params)
+    const { Items } = await this.documentClient.query(params).promise()
+    // console.log('query Result', Items)
+    return (
+      Items?.map((e) => {
+        return { ...e } as T
+      }) ?? []
+    )
+  }
+
+  async find<T>(key: KeyCondition) {
     const dbParams = {
       TableName: this.tableName,
-      Key: {
-        id,
-      },
+      Key: key,
     }
-    const result = await this.documentClient.get(dbParams).promise()
-    return result.Item
+    const { Item } = await this.documentClient.get(dbParams).promise()
+    return { ...Item } as T
   }
 
-  async post(itemParams: Record<never, never>) {
+  async post<T extends DynamoDBRecord>(itemParams: T) {
+    const timestamp = new Date().toISOString()
     const dbParams = {
       TableName: this.tableName,
       Item: {
-        id: uuid.v4(),
-        data: {
-          ...itemParams,
-          regist_datetime: moment().format(),
-          update_datetime: moment().format(),
-        },
+        ...itemParams,
+        created_at: timestamp,
+        updated_at: timestamp,
       },
     }
 
     // console.log("post", dbParams)
     await this.documentClient.put(dbParams).promise()
-    return dbParams.Item
+    return { ...dbParams.Item } as T
   }
 
-  async put(id: string, itemParams: Record<never, never>) {
+  async put<T>(key: KeyCondition, itemParams: T) {
+    const timestamp = new Date().toISOString()
     const dbParams = {
       TableName: this.tableName,
       Item: {
-        id,
-        data: {
-          ...itemParams,
-          update_datetime: moment().format(),
-        },
+        ...key,
+        ...itemParams,
+        updated_at: timestamp,
       },
     }
 
     // console.log("put", dbParams)
     await this.documentClient.put(dbParams).promise()
-    return dbParams.Item
+    return { ...dbParams.Item } as T
   }
 
-  async delete(id: string) {
+  async delete(key: KeyCondition) {
     const dbParams = {
       TableName: this.tableName,
-      Key: {
-        id,
-      },
+      Key: key,
     }
     await this.documentClient.delete(dbParams).promise()
-    return { id }
+    return key
   }
 }
 

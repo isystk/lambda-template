@@ -23,13 +23,11 @@ https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 .
 ├── README.md
 ├── app (Lambdaのモジュール)
-│   ├── data
 │   ├── dist
 │   ├── jest.config.ts
 │   ├── node_modules
 │   ├── package-lock.json
 │   ├── package.json
-│   ├── schema
 │   ├── src
 │   ├── tests
 │   └── tsconfig.json
@@ -41,6 +39,9 @@ https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
 ├── layers (共通モジュール)
 │   └── app-layer
 ├── samconfig.toml
+├── schema
+│   ├── data
+│   └── posts.json
 ├── task
 │   ├── env.json
 │   └── env.json.example
@@ -98,9 +99,9 @@ $ ./dc.sh start
 
 # DynamoDBにテーブルを作成する
 $ ./dc.sh aws local
-> aws dynamodb create-table --cli-input-json file://app/schema/posts.json --endpoint-url http://dynamodb:8000  --billing-mode PAY_PER_REQUEST
+> aws dynamodb create-table --cli-input-json file://schema/posts.json --endpoint-url http://dynamodb:8000  --billing-mode PAY_PER_REQUEST
 > aws dynamodb list-tables  --endpoint-url http://dynamodb:8000 
-> aws dynamodb scan --table-name simple_app_posts  --endpoint-url http://dynamodb:8000
+
 (テーブルを削除する場合)
 > aws dynamodb delete-table --table-name simple_app_posts --endpoint-url http://dynamodb:8000
 
@@ -113,11 +114,11 @@ $ sam local start-api --env-vars task/env.json --docker-network lambda-local
 # 一覧取得
 $ curl http://127.0.0.1:3000/posts
 # 登録
-$ curl -X POST -H "Content-Type: application/json" -d @app/data/post.json http://127.0.0.1:3000/posts
+$ curl -X POST -H "Content-Type: application/json" -d @schema/data/post.json http://127.0.0.1:3000/posts
 # 単一取得
 $ curl http://127.0.0.1:3000/posts/49e3de26-f28b-4140-becf-06d8b3279914/
 # 更新
-$ curl -X PUT -H "Content-Type: application/json" -d @app/data/post.json http://localhost:3000/posts/49e3de26-f28b-4140-becf-06d8b3279914/
+$ curl -X PUT -H "Content-Type: application/json" -d @schema/data/post.json http://localhost:3000/posts/49e3de26-f28b-4140-becf-06d8b3279914/
 # 削除
 $ curl -X DELETE http://127.0.0.1:3000/posts/49e3de26-f28b-4140-becf-06d8b3279914/
 ```
@@ -128,17 +129,6 @@ $ curl -X DELETE http://127.0.0.1:3000/posts/49e3de26-f28b-4140-becf-06d8b327991
 $ sam build
 # AWSに反映する
 $ sam deploy --config-env stg
-
-# 一覧取得
-$ curl https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
-# 登録
-$ curl -X POST -H "Content-Type: application/json" -d @app/data/post.json https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
-# 単一取得
-$ curl https://9eu3s3iz99.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
-# 更新
-$ curl -X PUT -H "Content-Type: application/json" -d @app/data/post.json https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
-# 削除
-$ curl -X DELETE https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/posts/49e3de26-f28b-4140-becf-06d8b3279914/
 
 # AWSから、DynamoDB、Lambda&APIGatewayを削除する
 $ sam delete --stack-name simple-app --profile lambda-user
