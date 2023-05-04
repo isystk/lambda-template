@@ -3,42 +3,41 @@ const dbClient = new DynamoDBClient('simple_app_posts')
 import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import uuid from 'node-uuid'
-import { isNumber, isString } from 'lodash'
+import { isString } from 'lodash'
 
 const app: Application = express()
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
 
-type RequestParam = {
-  userId: string | undefined
-  limit: string | undefined
-  last: string | undefined
-}
-
 type Post = {
   userId: string
   title: string
   description: string
-  photo: string
+  photo: string | undefined
 } & DynamoDBRecord
 
 app.get('/posts', async (req: Request, res: Response) => {
-  const { userId, limit, last }: RequestParam = {
-    userId: req.params['userId'],
-    limit: req.params['limit'],
-    last: req.params['last'],
+  const {
+    userId,
+    limit: limitStr,
+    page: pageStr,
+  } = {
+    userId: req.query['userId'],
+    limit: req.query['limit'],
+    page: req.query['page'],
   }
-
   try {
     if (userId !== undefined && !isString(userId)) {
-      throw new Error('An unexpected error occurred.')
+      throw new Error('userId is invalid.')
     }
-    if (limit !== undefined && !isNumber(limit)) {
-      throw new Error('An unexpected error occurred.')
+    let limit = Number(limitStr)
+    if (isNaN(limit)) {
+      limit = 10
     }
-    if (last !== undefined && !isString(last)) {
-      throw new Error('An unexpected error occurred.')
+    let page = Number(pageStr)
+    if (isNaN(page)) {
+      page = 1
     }
     let filter = undefined
     let attributeValues = undefined
@@ -55,6 +54,7 @@ app.get('/posts', async (req: Request, res: Response) => {
           return a.created_at < b.created_at ? -1 : 1
         })
       )
+      .then((e) => e.slice((page - 1) * limit, page * limit))
     res.json(posts)
   } catch (e: unknown) {
     console.error('error', e)
@@ -87,13 +87,28 @@ app.get('/posts/:id', async (req: Request, res: Response) => {
   }
 })
 app.post('/posts', async (req: Request, res: Response) => {
+  const { userId, title, description, photo } = {
+    userId: req.body['userId'],
+    title: req.body['title'],
+    description: req.body['description'],
+    photo: req.body['photo'],
+  }
   try {
+    if (userId === undefined) {
+      throw new Error('userId is required.')
+    }
+    if (title === undefined) {
+      throw new Error('title is required.')
+    }
+    if (description === undefined) {
+      throw new Error('description is required.')
+    }
     const params = {
       pk: uuid.v4(),
-      sk: req.body['userId'],
-      title: req.body['title'],
-      description: req.body['description'],
-      photo: req.body['photo'],
+      sk: userId,
+      title: title,
+      description: description,
+      photo: photo,
     } as Post
     const post = await dbClient.post<Post>(params)
     res.json(post)
@@ -110,15 +125,32 @@ app.post('/posts', async (req: Request, res: Response) => {
 })
 app.put('/posts/:id', async (req: Request, res: Response) => {
   const { id } = req.params
-  const params = {
+  const { userId, title, description, photo } = {
+    userId: req.body['userId'],
     title: req.body['title'],
     description: req.body['description'],
     photo: req.body['photo'],
+  }
+  if (!id) {
+    throw new Error('ID is required.')
+  }
+  if (userId === undefined) {
+    throw new Error('userId is required.')
+  }
+  if (title === undefined) {
+    throw new Error('title is required.')
+  }
+  if (description === undefined) {
+    throw new Error('description is required.')
+  }
+  const params = {
+    pk: id,
+    sk: userId,
+    title: title,
+    description: description,
+    photo: photo,
   } as Post
   try {
-    if (!id) {
-      throw new Error('ID is required.')
-    }
     let post = await getPost(id)
     if (!post) {
       res.sendStatus(404).json({

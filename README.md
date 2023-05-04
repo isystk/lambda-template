@@ -15,7 +15,7 @@ SAM を利用して管理しているので、コマンドひとつでインフ�
 
 ## 🌐 Demo
 
-https://obew4p54y9.execute-api.ap-northeast-1.amazonaws.com/Prod/posts
+![デモ画面](./demo.png "デモ画面")
 
 ## 📦 ディレクトリ構造
 
@@ -113,6 +113,8 @@ $ sam local start-api --env-vars task/env.json --docker-network lambda-local
 
 # 一覧取得
 $ curl http://127.0.0.1:3000/posts
+$ curl "http://127.0.0.1:3000/posts?limit=3&page=2"
+$ curl "http://127.0.0.1:3000/posts?userId=aaa"
 # 登録
 $ curl -X POST -H "Content-Type: application/json" -d @schema/data/post.json http://127.0.0.1:3000/posts
 # 単一取得

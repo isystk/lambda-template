@@ -46,7 +46,7 @@ class DynamoDBClient {
 
     // console.log('query Condition', params)
     const { Items } = await this.documentClient.scan(params).promise()
-    // console.log('query Result', result)
+    // console.log('query Result', Items)
     return (
       Items?.map((e) => {
         return { ...e } as T
