@@ -4,7 +4,7 @@ version = 0.1
 [default.deploy.parameters]
 # 検証環境用
 [stg.deploy.parameters]
-stack_name = "simple-app"
+stack_name = "lambda-template"
 s3_bucket = "aws-isystk-com-sam"
 s3_prefix = "lambda-template"
 region = "ap-northeast-1"

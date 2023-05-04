@@ -133,7 +133,7 @@ $ sam build
 $ sam deploy --config-env stg
 
 # AWSから、DynamoDB、Lambda&APIGatewayを削除する
-$ sam delete --stack-name simple-app --profile lambda-user
+$ sam delete --stack-name lambda-template --profile lambda-user
 ```
 
 ### DynamoDBAdmin
