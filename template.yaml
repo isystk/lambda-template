@@ -57,6 +57,9 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Layers:
         - !Ref AppLayer
+      Environment:
+        Variables:
+          SAMPLE_ENV: ""
       Events:
         Api:
           Type: Api
