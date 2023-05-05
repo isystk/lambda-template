@@ -58,7 +58,11 @@ app.get('/posts', async (req: Request, res: Response) => {
     res.json(posts)
   } catch (e: unknown) {
     console.error('error', e)
-    res.sendStatus(500)
+    let message
+    if (e instanceof Error) {
+      message = e.message
+    }
+    res.status(500).json({ message })
   }
 })
 app.get('/posts/:id', async (req: Request, res: Response) => {
@@ -71,7 +75,11 @@ app.get('/posts/:id', async (req: Request, res: Response) => {
     res.json(post)
   } catch (e: unknown) {
     console.error('error', e)
-    res.sendStatus(500)
+    let message
+    if (e instanceof Error) {
+      message = e.message
+    }
+    res.status(500).json({ message })
   }
 })
 app.post('/posts', async (req: Request, res: Response) => {
@@ -102,7 +110,11 @@ app.post('/posts', async (req: Request, res: Response) => {
     res.json(post)
   } catch (e: unknown) {
     console.error('error', e)
-    res.sendStatus(500)
+    let message
+    if (e instanceof Error) {
+      message = e.message
+    }
+    res.status(500).json({ message })
   }
 })
 app.put('/posts/:id', async (req: Request, res: Response) => {
@@ -144,7 +156,11 @@ app.put('/posts/:id', async (req: Request, res: Response) => {
     res.json(post)
   } catch (e: unknown) {
     console.error('error', e)
-    res.sendStatus(500)
+    let message
+    if (e instanceof Error) {
+      message = e.message
+    }
+    res.status(500).json({ message })
   }
 })
 app.delete('/posts/:id', async (req: Request, res: Response) => {
@@ -164,7 +180,11 @@ app.delete('/posts/:id', async (req: Request, res: Response) => {
     res.json(key)
   } catch (e: unknown) {
     console.error('error', e)
-    res.sendStatus(500)
+    let message
+    if (e instanceof Error) {
+      message = e.message
+    }
+    res.status(500).json({ message })
   }
 })
 
