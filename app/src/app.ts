@@ -138,8 +138,6 @@ app.put('/posts/:id', async (req: Request, res: Response) => {
     throw new Error('description is required.')
   }
   const params = {
-    pk: id,
-    sk: userId,
     title: title,
     description: description,
     photo: photo,

@@ -106,15 +106,16 @@ class DynamoDBClient {
     await this.documentClient.put(dbParams).promise()
     return { ...dbParams.Item } as T
   }
-
-  async update<T>(key: KeyCondition, itemParams: T) {
+  async update<T extends DynamoDBRecord>(key: KeyCondition, itemParams: T) {
     const current = await this.find<T>(key)
     const timestamp = new Date().toISOString()
     const dbParams = {
       TableName: this.tableName,
       Item: {
-        ...current,
         ...itemParams,
+        pk: current.pk,
+        sk: current.sk,
+        created_at: current.created_at,
         updated_at: timestamp,
       },
     }
