@@ -91,7 +91,7 @@ class DynamoDBClient {
     return { ...Item } as T
   }
 
-  async post<T extends DynamoDBRecord>(itemParams: T) {
+  async create<T extends DynamoDBRecord>(itemParams: T) {
     const timestamp = new Date().toISOString()
     const dbParams = {
       TableName: this.tableName,
@@ -107,12 +107,13 @@ class DynamoDBClient {
     return { ...dbParams.Item } as T
   }
 
-  async put<T>(key: KeyCondition, itemParams: T) {
+  async update<T>(key: KeyCondition, itemParams: T) {
+    const current = await this.find<T>(key)
     const timestamp = new Date().toISOString()
     const dbParams = {
       TableName: this.tableName,
       Item: {
-        ...key,
+        ...current,
         ...itemParams,
         updated_at: timestamp,
       },

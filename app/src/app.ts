@@ -106,7 +106,7 @@ app.post('/posts', async (req: Request, res: Response) => {
       description: description,
       photo: photo,
     } as Post
-    const post = await dbClient.post<Post>(params)
+    const post = await dbClient.create<Post>(params)
     res.json(post)
   } catch (e: unknown) {
     console.error('error', e)
@@ -147,12 +147,15 @@ app.put('/posts/:id', async (req: Request, res: Response) => {
   try {
     let post = await getPost(id)
     if (!post) {
-      res.sendStatus(404).json({
+      res.status(404).json({
         message: 'Data Not found.',
       })
       return
     }
-    post = await dbClient.put<Post>({ pk: post.pk, sk: post.sk }, params)
+    if (post.sk !== userId) {
+      throw new Error("Invalid userId.")
+    }
+    post = await dbClient.update<Post>({ pk: post.pk, sk: post.sk }, params)
     res.json(post)
   } catch (e: unknown) {
     console.error('error', e)
@@ -171,7 +174,7 @@ app.delete('/posts/:id', async (req: Request, res: Response) => {
     }
     const post = await getPost(id)
     if (!post) {
-      res.sendStatus(404).json({
+      res.status(404).json({
         message: 'Data Not found.',
       })
       return
@@ -197,5 +200,10 @@ const getPost = async (pk: string): Promise<Post | undefined> => {
   }
   return post[0]
 }
+
+// 404エラーハンドリング
+app.use((_req, res, _next) => {
+  res.status(404).send('404 Not Found').end();
+});
 
 export { app }
