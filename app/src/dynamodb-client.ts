@@ -112,6 +112,7 @@ class DynamoDBClient {
     const dbParams = {
       TableName: this.tableName,
       Item: {
+        ...current,
         ...itemParams,
         pk: current.pk,
         sk: current.sk,
