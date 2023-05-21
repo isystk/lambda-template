@@ -4,11 +4,23 @@ import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import uuid from 'node-uuid'
 import { isString } from 'lodash'
+import session from './session'
+
+// メール送信を利用する場合
+// import { SmtpClient } from './smtp-client'
+// const mailClient = new SmtpClient()
 
 const app: Application = express()
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: '*', //アクセス許可するオリジン
+    credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
+    optionsSuccessStatus: 200, //レスポンスstatusを200に設定
+  })
+)
+session(app)
 
 type Post = {
   userId: string
@@ -151,7 +163,7 @@ app.put('/posts/:id', async (req: Request, res: Response) => {
       return
     }
     if (post.sk !== userId) {
-      throw new Error("Invalid userId.")
+      throw new Error('Invalid userId.')
     }
     post = await dbClient.update<Post>({ pk: post.pk, sk: post.sk }, params)
     res.json(post)
@@ -201,7 +213,7 @@ const getPost = async (pk: string): Promise<Post | undefined> => {
 
 // 404エラーハンドリング
 app.use((_req, res, _next) => {
-  res.status(404).send('404 Not Found').end();
-});
+  res.status(404).send('404 Not Found').end()
+})
 
 export { app }
