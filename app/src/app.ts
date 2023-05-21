@@ -4,11 +4,22 @@ import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import uuid from 'node-uuid'
 import { isString } from 'lodash'
+import session from './session'
+
+import { SmtpClient } from './smtp-client'
+const mailClient = new SmtpClient()
 
 const app: Application = express()
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: "*", //アクセス許可するオリジン
+    credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
+    optionsSuccessStatus: 200, //レスポンスstatusを200に設定
+  })
+)
+session(app)
 
 type Post = {
   userId: string
